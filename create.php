@@ -6,45 +6,51 @@ if ( !empty($_POST)) {
 	$idError = null;
 	$nomeError = null;
 	$idadeError = null;
+	$acessoError = null;
 	$funcaoError = null;
 
         // Dados do Header
-	$nome = $_POST['nome'];
-	$idade = $_POST['idade'];
-	$funcao = $_POST['funcao'];
+	!empty($_POST['nome']) ? $nome = $_POST['nome'] : $nome = null ;
+	!empty($_POST['idade']) ? $idade = $_POST['idade'] : $idade = null;
+	!empty($_POST['acesso']) ? $acesso = $_POST['acesso'] : $acesso = null;
+	!empty($_POST['funcao']) ? $funcao = $_POST['funcao'] : $funcao = null;
 
         // Validando
 	$validUsuario = true;
 	$validFuncao = true;
-	if (empty($nome)) {
+	if (!isset($nome)) {
 		$nomeError = 'Por Favor digite um nome';
 		$validUsuario = false;
 	}
-	if (empty($idade)) {
+	if (!isset($idade)) {
 		$idadeError = 'Por favor digite uma idade';
 		$validUsuario = false;
 	}
-	if (empty($funcao)) {
+	if (!isset($acesso)) {
+		$funcaoError = 'Por favor digite um nível de acesso';
+		$validUsuario = false;
+	}
+	if (!isset($funcao)) {
 		$funcaoError = 'Por favor digite o nome da função';
-		$validFuncao = true;
+		$validFuncao = false;
 	}
 
         // Criando Usuario
 	if ($validUsuario) {
 		$pdo = Banco::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "INSERT INTO usuario (nome,idade) values(?, ?)";
+		$sql = "INSERT INTO usuario (nome,idade, acesso) values(?, ?, ?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($nome,$idade));
+		$q->execute(array($nome,$idade, $acesso));
 		Banco::disconnect();
 		header("Location: read.php");
 	}
 	else if ($validFuncao) {
 		$pdo = Banco::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "INSERT INTO funcao (nome) values(?)";
+		$sql = "INSERT INTO funcao (nome, acesso) values(?, ?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($funcao));
+		$q->execute(array($funcao, $acesso));
 		Banco::disconnect();
 		header("Location: read.php");
 	}
@@ -85,21 +91,36 @@ if ( !empty($_POST)) {
 			<form action="create.php" method="post">
 				<div class="row">
 					<span>Nome</span> 
+					
+					<input name="nome" type="text" placeholder="Nome de usuario" value="<?php echo !empty($nome)?$nome:'';?>">
+
 					<?php 
 					if (!empty($nomeError)): 
-						echo "<span>empty".($nomeError)."</span>";
+						echo "<span>".($nomeError)."</span>";
 					endif;
 					?>
-					<input name="nome" type="text" placeholder="Nome de usuario" value="<?php echo !empty($nome)?$nome:'';?>">
 				</div>
 				<div class="row">
 					<span>Idade</span> 
+					
+					<input type="text" name="idade" type="text" placeholder="Idade do usuário" value="<?php echo !empty($idade)?$idade:'';?>">
+
 					<?php 
 					if (!empty($idadeError)): 
-						echo "<span>empty".($idadeError)."</span>";
+						echo "<span>".($idadeError)."</span>";
 					endif;
 					?>
-					<input type="text" name="idade" type="text" placeholder="Idade do usuário" value="<?php echo !empty($idade)?$idade:'';?>">
+				</div>	
+				<div class="row">
+					<span>Nível de Acesso</span> 
+					
+					<input type="text" name="acesso" type="text" placeholder="Nível de Acesso do usuário" value="<?php echo !empty($acesso)?$acesso:'';?>">
+
+					<?php 
+					if (!empty($acessoError)): 
+						echo "<span>".($acessoError)."</span>";
+					endif;
+					?>
 				</div>	
 				<button type="submit" >Adicionar Usuario</button>			
 			</form>
@@ -110,6 +131,7 @@ if ( !empty($_POST)) {
 						<th>Id</th>
 						<th>Nome</th>
 						<th>Idade</th>
+						<th>Acesso</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -121,6 +143,7 @@ if ( !empty($_POST)) {
 						echo '<td>'. $row['id'] . '</td>';
 						echo '<td>'. $row['nome'] . '</td>';
 						echo '<td>'. $row['idade'] . '</td>';
+						echo '<td>'. $row['acesso'] . '</td>';
 						echo '</tr>';
 					}
 					
@@ -138,12 +161,25 @@ if ( !empty($_POST)) {
 			<form action="create.php" method="post">
 				<div class="row">
 					<span>Função</span>
+					
+					<input type="text" name="funcao" type="text" placeholder="Nova função" value="<?php echo !empty($funcao)?$funcao:'';?>">
+
 					<?php 
-					if (!empty($funcaoError)): 
-						echo "<span>empty".($funcaoError)."</span>";
+					if (!empty($funcaoError)):
+						echo "<span>".($funcaoError)."</span>";
 					endif;
 					?>
-					<input type="text" name="funcao" type="text" placeholder="Nova função" value="<?php echo !empty($funcao)?$funcao:'';?>">
+				</div>
+				<div class="row">
+					<span>Nível de Acesso</span>
+					
+					<input type="text" name="acesso" type="text" placeholder="Nova função" value="<?php echo !empty($acesso)?$acesso:'';?>">
+
+					<?php 
+					if (!empty($funcaoError)):
+						echo "<span>".($acessoError)."</span>";
+					endif;
+					?>
 				</div>
 				<button type="submit" >Adicionar Função</button>
 			</form>
@@ -153,6 +189,7 @@ if ( !empty($_POST)) {
 					<tr>
 						<th>Id</th>
 						<th>nome</th>
+						<th>Nível de Acesso</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -162,6 +199,7 @@ if ( !empty($_POST)) {
 						echo '<tr>';
 						echo '<td>'. $row['id'] . '</td>';
 						echo '<td>'. $row['nome'] . '</td>';
+						echo '<td>'. $row['acesso'] . '</td>';
 						echo '</tr>';
 					}
 					Banco::disconnect();

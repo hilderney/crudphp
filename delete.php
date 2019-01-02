@@ -152,6 +152,7 @@ if ( !empty($_GET)) {
 						<tr>
 							<th>Id</th>
 							<th>nome</th>
+							<th>Função</th>
 						</tr>
 					</thead>
 					<tbody>

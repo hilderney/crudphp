@@ -4,6 +4,7 @@
 	$passedId = null;
 	$passedNome = null;
 	$passedIdade = null;
+	$passedAcesso = null;
 	$passedTable = null;
 
 	if ( !empty($_GET)) {
@@ -27,6 +28,7 @@
         			$passedId = $row['id'];
         			$passedNome = $row['nome'];
         			$passedIdade = $row['idade'];
+        			$passedAcesso = $row['acesso'];
         			$isUsuario = true;
         			$passedTable = "usuario";
         		}
@@ -43,6 +45,7 @@
         		if (!empty($row['id'])) {
         			$passedId = $row['id'];
         			$passedNome = $row['nome'];
+        			$passedAcesso = $row['acesso'];
         			$isFuncao = true;
         			$passedTable = "funcao";
         		}
@@ -58,12 +61,14 @@
        	$idError = null;
         $nomeError = null;
         $idadeError = null;
+        $acessoError = null;
         $funcaoError = null;
          
         // Dados do Header
         $id = $_POST['id'];
         $nome = $_POST['nome'];
         $idade = $_POST['idade'];
+        $acesso = $_POST['acesso'];
         $funcao = $_POST['funcao'];
          
         // Validando
@@ -77,6 +82,10 @@
             $idadeError = 'Por favor digite uma idade';
             $validUsuario = false;
         }
+        if (empty($acesso)) {
+            $acessoError = 'Por favor digite uma acesso';
+            $validUsuario = false;
+        }
         if (empty($funcao)) {
         	$funcaoError = 'Por favor digite o nome da função';
         	$validFuncao = true;
@@ -86,18 +95,18 @@
         if ($validUsuario) {
             $pdo = Banco::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "UPDATE usuario SET nome = ?, idade = ? WHERE id = ? ";
+            $sql = "UPDATE usuario SET nome = ?, idade = ?, acesso = ? WHERE id = ? ";
             $q = $pdo->prepare($sql);
-            $q->execute(array($nome, $idade, $id));
+            $q->execute(array($nome, $idade, $acesso, $id));
             Banco::disconnect();
             header("Location: read.php");
         }
         else if ($validFuncao) {
         	$pdo = Banco::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "UPDATE funcao SET nome = ? WHERE id = ? ";
+            $sql = "UPDATE funcao SET nome = ?, acesso = ? WHERE id = ? ";
             $q = $pdo->prepare($sql);
-            $q->execute(array($funcao, $id));
+            $q->execute(array($funcao, $acesso, $id));
             Banco::disconnect();
             header("Location: read.php");
         }
@@ -143,7 +152,8 @@
 							<th>Id</th>
 							<th>Nome</th>
 							<th>Idade</th>
-							<th>Função</th>
+							<th>Acesso</th>
+							<th>Ação</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -155,6 +165,7 @@
 							echo '<td>'. $row['id'] . '</td>';
 							echo '<td>'. $row['nome'] . '</td>';
 							echo '<td>'. $row['idade'] . '</td>';
+							echo '<td>'. $row['acesso']. '</td>';
 							echo '<td> 
 								<button> <a href="./update.php?usuariotoedit='.$row['id'].'" >editar</a> </button>
 								</td>';
@@ -172,6 +183,8 @@
 						<tr>
 							<th>Id</th>
 							<th>nome</th>
+							<th>Acesso</th>
+							<th>Ação</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -181,6 +194,7 @@
 							echo '<tr>';
 							echo '<td>'. $row['id'] . '</td>';
 							echo '<td>'. $row['nome'] . '</td>';
+							echo '<td>'. $row['acesso']. '</td>';
 							echo '<td> 
 								<button> <a href="./update.php?funcaotoedit='.$row['id'].'" >editar</a> </button>
 								</td>';
@@ -215,6 +229,15 @@
 					?>
 					<input type="text" name="idade" type="text" placeholder="Idade" value="<?php echo !empty($passedIdade) ? $passedIdade : '' ; ?>">
 				</div>	
+				<div class="row">
+					<span>Nível de Acesso</span> 
+					<?php 
+						if (!empty($acessoError)): 
+						echo "<span>empty".($acessoError)."</span>";
+						endif;
+					?>
+					<input type="text" name="acesso" type="text" placeholder="Nível de Acesso" value="<?php echo !empty($passedAcesso) ? $passedAcesso : '' ; ?>">
+				</div>
 				<button type="submit" >Atualizar Usuario</button>			
 			</form>
 
@@ -232,6 +255,15 @@
 					?>
 					<input type="hidden" name="id" value="<?php echo $passedId ?>" > 
 					<input type="text" name="funcao" type="text" placeholder="Função" value="<?php echo !empty($passedNome) ? $passedNome : '' ; ?>">
+				</div>
+				<div class="row">
+					<span>Nível de Acesso</span> 
+					<?php 
+						if (!empty($acessoError)): 
+						echo "<span>empty".($acessoError)."</span>";
+						endif;
+					?>
+					<input type="text" name="acesso" type="text" placeholder="Nível de Acesso" value="<?php echo !empty($passedAcesso) ? $passedAcesso : '' ; ?>">
 				</div>
 				<button type="submit" >Atualizar Função</button>
 			</form>

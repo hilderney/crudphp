@@ -31,6 +31,36 @@ include 'banco.php';
 			<option value="2">Função</option>
 			<option value="3" selected>Todos</option>
 		</select>
+		
+		<div id="tableJoin">
+			<h1>Usuários + Funções </h1>
+			<table>
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Nome</th>
+						<th>Idade</th>
+						<th>Cargo</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$pdo = Banco::connect();
+					$sql = 'SELECT U.id, U.nome, U.idade, F.nome as funcao FROM usuario AS U INNER JOIN funcao AS F ON U.acesso = F.acesso ORDER BY F.acesso DESC';
+					foreach ($pdo->query($sql) as $row) {
+						echo '<tr>';
+						echo '<td>'. $row['id'] . '</td>';
+						echo '<td>'. $row['nome'] . '</td>';
+						echo '<td>'. $row['idade'] . '</td>';
+						echo '<td>'. $row['funcao'] . '</td>';
+						
+						echo '</tr>';
+					}
+
+					?>
+				</tbody>
+			</table>
+		</div>
 
 		<div id="tableUsuario">
 			<h1>Usuario </h1>
@@ -40,6 +70,7 @@ include 'banco.php';
 						<th>Id</th>
 						<th>Nome</th>
 						<th>Idade</th>
+						<th>Acesso</th>
 						<th>Ação</th>
 					</tr>
 				</thead>
@@ -52,6 +83,7 @@ include 'banco.php';
 						echo '<td>'. $row['id'] . '</td>';
 						echo '<td>'. $row['nome'] . '</td>';
 						echo '<td>'. $row['idade'] . '</td>';
+						echo '<td>'. $row['acesso'] . '</td>';
 						echo '<td> 
 						<button> <a href="./update.php?usuariotoedit='.$row['id'].'" >editar</a> </button> 
 						<button> <a href="./delete.php?usuariotodelete='.$row['id'].'" >excluir</a> </button> </td>';
@@ -70,6 +102,7 @@ include 'banco.php';
 						<th>Id</th>
 						<th>nome</th>
 						<th>Ação</th>
+						<th>Ação</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -79,6 +112,7 @@ include 'banco.php';
 						echo '<tr>';
 						echo '<td>'. $row['id'] . '</td>';
 						echo '<td>'. $row['nome'] . '</td>';
+						echo '<td>'. $row['acesso'] . '</td>';
 						echo '<td> 
 						<button> <a href="./update.php?funcaotoedit='.$row['id'].'" >editar</a> </button> 
 						<button> <a href="./delete.php?funcaotodelete='.$row['id'].'" >excluir</a> </button> </td>';
